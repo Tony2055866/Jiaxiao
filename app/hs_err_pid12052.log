@@ -1,0 +1,160 @@
+#
+# There is insufficient memory for the Java Runtime Environment to continue.
+# Native memory allocation (malloc) failed to allocate 41536 bytes for Chunk::new
+# Possible reasons:
+#   The system is out of physical RAM or swap space
+#   In 32 bit mode, the process size limit was hit
+# Possible solutions:
+#   Reduce memory load on the system
+#   Increase physical memory or swap space
+#   Check if swap backing store is full
+#   Use 64 bit Java on a 64 bit OS
+#   Decrease Java heap size (-Xmx/-Xms)
+#   Decrease number of Java threads
+#   Decrease Java thread stack sizes (-Xss)
+#   Set larger code cache with -XX:ReservedCodeCacheSize=
+# This output file may be truncated or incomplete.
+#
+#  Out of Memory Error (allocation.cpp:323), pid=12052, tid=13200
+#
+# JRE version: Java(TM) SE Runtime Environment (7.0_79-b15) (build 1.7.0_79-b15)
+# Java VM: Java HotSpot(TM) 64-Bit Server VM (24.79-b02 mixed mode windows-amd64 compressed oops)
+# Failed to write core dump. Minidumps are not enabled by default on client versions of Windows
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x0000000009be4800):  JavaThread "C2 CompilerThread1" daemon [_thread_in_native, id=13200, stack(0x000000000b6c0000,0x000000000b7c0000)]
+
+Stack: [0x000000000b6c0000,0x000000000b7c0000]
+[error occurred during error reporting (printing stack bounds), id 0xc0000005]
+
+
+[error occurred during error reporting (printing native stack), id 0xc0000005]
+
+
+Current CompileTask:
+C2:   1114    2             sun.misc.ASCIICaseInsensitiveComparator::compare (126 bytes)
+
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x0000000009bea000 JavaThread "Service Thread" daemon [_thread_blocked, id=13832, stack(0x000000000b830000,0x000000000b930000)]
+=>0x0000000009be4800 JavaThread "C2 CompilerThread1" daemon [_thread_in_native, id=13200, stack(0x000000000b6c0000,0x000000000b7c0000)]
+  0x0000000009bd6000 JavaThread "C2 CompilerThread0" daemon [_thread_blocked, id=14032, stack(0x000000000b500000,0x000000000b600000)]
+  0x0000000009bd5000 JavaThread "Attach Listener" daemon [_thread_blocked, id=9108, stack(0x000000000b360000,0x000000000b460000)]
+  0x0000000009bd4000 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=4264, stack(0x000000000b170000,0x000000000b270000)]
+  0x0000000008c21000 JavaThread "Finalizer" daemon [_thread_blocked, id=13840, stack(0x000000000af10000,0x000000000b010000)]
+  0x0000000002116800 JavaThread "Reference Handler" daemon [_thread_blocked, id=12404, stack(0x000000000adb0000,0x000000000aeb0000)]
+  0x00000000021be000 JavaThread "main" [_thread_in_native, id=11780, stack(0x0000000002240000,0x0000000002340000)]
+
+Other Threads:
+  0x0000000008c1d800 VMThread [stack: 0x000000000abf0000,0x000000000acf0000] [id=13752]
+  0x0000000009bf3800 WatcherThread [stack: 0x000000000b990000,0x000000000ba90000] [id=13324]
+
+VM state:not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread: None
+
+Heap
+ PSYoungGen      total 76288K, used 2621K [0x00000000eaa80000, 0x00000000eff80000, 0x0000000100000000)
+  eden space 65536K, 4% used [0x00000000eaa80000,0x00000000ead0f6b8,0x00000000eea80000)
+  from space 10752K, 0% used [0x00000000ef500000,0x00000000ef500000,0x00000000eff80000)
+  to   space 10752K, 0% used [0x00000000eea80000,0x00000000eea80000,0x00000000ef500000)
+ ParOldGen       total 173568K, used 0K [0x00000000c0000000, 0x00000000ca980000, 0x00000000eaa80000)
+  object space 173568K, 0% used [0x00000000c0000000,0x00000000c0000000,0x00000000ca980000)
+ PSPermGen       total 21504K, used 2847K [0x00000000bae00000, 0x00000000bc300000, 0x00000000c0000000)
+  object space 21504K, 13% used [0x00000000bae00000,0x00000000bb0c7c90,0x00000000bc300000)
+
+Card table byte_map: [0x00000000054d0000,0x0000000005700000] byte_map_base: 0x0000000004ef9000
+
+Polling page: 0x0000000000340000
+
+Code Cache  [0x0000000002410000, 0x0000000002680000, 0x0000000005410000)
+ total_blobs=189 nmethods=1 adapters=141 free_code_cache=48765Kb largest_free_block=49921472
+
+Compilation events (3 events):
+Event: 1.018 Thread 0x0000000009bd6000    1             java.lang.String::charAt (29 bytes)
+Event: 1.025 Thread 0x0000000009bd6000 nmethod 1 0x0000000002470b50 code [0x0000000002470c80, 0x0000000002470d18]
+Event: 1.068 Thread 0x0000000009be4800    2             sun.misc.ASCIICaseInsensitiveComparator::compare (126 bytes)
+
+GC Heap History (0 events):
+No events
+
+Deoptimization events (0 events):
+No events
+
+Internal exceptions (4 events):
+Event: 0.113 Thread 0x00000000021be000 Threw 0x00000000eaa8f690 at C:\re\jdk7u79\2331\hotspot\src\share\vm\prims\jni.cpp:3991
+Event: 0.816 Thread 0x00000000021be000 Threw 0x00000000eab16df8 at C:\re\jdk7u79\2331\hotspot\src\share\vm\prims\jvm.cpp:1304
+Event: 1.067 Thread 0x00000000021be000 Threw 0x00000000eab27c08 at C:\re\jdk7u79\2331\hotspot\src\share\vm\prims\jvm.cpp:1304
+Event: 1.068 Thread 0x00000000021be000 Threw 0x00000000eab2bb58 at C:\re\jdk7u79\2331\hotspot\src\share\vm\prims\jvm.cpp:1304
+
+Events (10 events):
+Event: 1.066 loading class 0x0000000009c3cb60
+Event: 1.066 loading class 0x0000000009c3cb60 done
+Event: 1.067 loading class 0x0000000008a666f0
+Event: 1.067 loading class 0x0000000008a666f0 done
+Event: 1.067 loading class 0x0000000008c35030
+Event: 1.067 loading class 0x0000000008c35030 done
+Event: 1.067 loading class 0x0000000008a4d3b0
+Event: 1.068 loading class 0x0000000008a4d3b0 done
+Event: 1.068 loading class 0x0000000008c1d150
+Event: 1.068 loading class 0x0000000008c1d150 done
+
+
+Dynamic libraries:
+0x000000013f6b0000 - 0x000000013f6e3000 	C:\Program Files\Java\jdk1.7.0_79\bin\java.exe
+0x0000000077c20000 - 0x0000000077dc8000 	C:\Windows\SYSTEM32\ntdll.dll
+0x0000000077b00000 - 0x0000000077c1f000 	C:\Windows\system32\kernel32.dll
+0x000007fefdc40000 - 0x000007fefdcac000 	C:\Windows\system32\KERNELBASE.dll
+0x000007fefdda0000 - 0x000007fefde7b000 	C:\Windows\system32\ADVAPI32.dll
+0x000007feffdc0000 - 0x000007feffe5f000 	C:\Windows\system32\msvcrt.dll
+0x000007feff000000 - 0x000007feff01f000 	C:\Windows\SYSTEM32\sechost.dll
+0x000007fefe540000 - 0x000007fefe66d000 	C:\Windows\system32\RPCRT4.dll
+0x0000000077a00000 - 0x0000000077afa000 	C:\Windows\system32\USER32.dll
+0x000007fefe1b0000 - 0x000007fefe217000 	C:\Windows\system32\GDI32.dll
+0x000007feffdb0000 - 0x000007feffdbe000 	C:\Windows\system32\LPK.dll
+0x000007feffe60000 - 0x000007fefff29000 	C:\Windows\system32\USP10.dll
+0x000007fefc320000 - 0x000007fefc514000 	C:\Windows\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.7601.18837_none_fa3b1e3d17594757\COMCTL32.dll
+0x000007fefeb30000 - 0x000007fefeba1000 	C:\Windows\system32\SHLWAPI.dll
+0x000007fefe0e0000 - 0x000007fefe10e000 	C:\Windows\system32\IMM32.DLL
+0x000007fefea20000 - 0x000007fefeb29000 	C:\Windows\system32\MSCTF.dll
+0x000000006a900000 - 0x000000006a9d2000 	C:\Program Files\Java\jdk1.7.0_79\jre\bin\msvcr100.dll
+0x0000000057ec0000 - 0x0000000058695000 	C:\Program Files\Java\jdk1.7.0_79\jre\bin\server\jvm.dll
+0x000007fef9f30000 - 0x000007fef9f39000 	C:\Windows\system32\WSOCK32.dll
+0x000007fefe4f0000 - 0x000007fefe53d000 	C:\Windows\system32\WS2_32.dll
+0x000007fefdd90000 - 0x000007fefdd98000 	C:\Windows\system32\NSI.dll
+0x000007fefa9b0000 - 0x000007fefa9eb000 	C:\Windows\system32\WINMM.dll
+0x0000000077df0000 - 0x0000000077df7000 	C:\Windows\system32\PSAPI.DLL
+0x00000000704d0000 - 0x00000000704df000 	C:\Program Files\Java\jdk1.7.0_79\jre\bin\verify.dll
+0x00000000704a0000 - 0x00000000704c8000 	C:\Program Files\Java\jdk1.7.0_79\jre\bin\java.dll
+0x000000006efb0000 - 0x000000006efc5000 	C:\Program Files\Java\jdk1.7.0_79\jre\bin\zip.dll
+
+VM Arguments:
+jvm_args: -Xmx1024M -Dfile.encoding=GBK -Duser.country=CN -Duser.language=zh -Duser.variant 
+java_command: com.android.dx.command.Main --dex --num-threads=4 --output C:\Users\gaotong1\AndroidStudioProjects\Jiaxiao\app\build\intermediates\pre-dexed\debug\classes-750925aadfd7d685acf820a4f6c33886f7d6fd87.jar C:\Users\gaotong1\AndroidStudioProjects\Jiaxiao\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-gcm\7.0.0\jars\classes.jar
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+PATH=C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\Java\jdk1.7.0_79\bin
+USERNAME=gaotong1
+OS=Windows_NT
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 60 Stepping 3, GenuineIntel
+
+
+
+---------------  S Y S T E M  ---------------
+
+OS: Windows 7 , 64 bit Build 7601 Service Pack 1
+
+CPU:total 8 (4 cores per cpu, 2 threads per core) family 6 model 60 stepping 3, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, avx, avx2, aes, erms, ht, tsc, tscinvbit
+
+Memory: 4k page, physical 16683112k(1581676k free), swap 16681260k(141536k free)
+
+vm_info: Java HotSpot(TM) 64-Bit Server VM (24.79-b02) for windows-amd64 JRE (1.7.0_79-b15), built on Apr 10 2015 12:36:16 by "java_re" with unknown MS VC++:1600
+
+time: Tue Jul 14 18:04:19 2015
+elapsed time: 1 seconds
+
