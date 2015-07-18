@@ -32,12 +32,26 @@
         android:inputType="text"
         android:id="@+id/imageInput"
         />
-
+<LinearLayout android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login"
+        android:text="登录"
         android:id="@+id/button" />
+    
+    <Button android:text="取消预约"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button android:text="停止刷新"
+        android:onClick="stopClick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+    </LinearLayout>
+
     
     <TextView
         android:layout_width="wrap_content"
@@ -57,41 +71,59 @@
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="日"
+            android:text="周日"
             android:checked="true"
+            android:onClick="weekClick"
             android:id="@+id/checkBox0" />
+
+        
        
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="周一"
+            android:onClick="weekClick"
             android:id="@+id/checkBox1" />
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="周二"
+            android:onClick="weekClick"
             android:id="@+id/checkBox2" />
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="周三"
+            android:onClick="weekClick"
             android:id="@+id/checkBox3" />
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="周四"
+            android:onClick="weekClick"
             android:id="@+id/checkBox4" />
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="周五"
+            android:onClick="weekClick"
             android:id="@+id/checkBox5" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="周六"
+            android:onClick="weekClick"
             android:id="@+id/checkBox6" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="周五"
+            android:onClick="weekClick"
+            android:id="@+id/checkBox7" />
+
+       
     </LinearLayout>
 
 
