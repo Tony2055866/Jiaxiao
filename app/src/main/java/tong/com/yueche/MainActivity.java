@@ -32,6 +32,7 @@ import java.util.Calendar;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
+
     Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -80,6 +81,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 }else if(msg.what == 12){
                     failText.setVisibility(View.VISIBLE);
                     failText.setText("网络不可用，已停止");
+                }else if(msg.what == MsgCode.BOOKING_ERROR_NETWORK){
+                    failText.setVisibility(View.VISIBLE);
+                    failText.setText("网络不可用");
                 }
             }
         }
@@ -135,6 +139,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     static boolean isLogin = false;
     static int reLoginCnt = 0;
+    static final int NIGHT_SLEEP_TIME = 10000;//服务不可用时睡眠时间
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.button){
@@ -159,8 +164,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 public void run() {
                     try {
                         while(running){
+                            
                             if(!isNetworkAvailable(MainActivity.this)){
-                                handler.sendEmptyMessage(12);
+                                handler.sendEmptyMessage(MsgCode.BOOKING_ERROR_NETWORK);
                                 return;
                             }
                             
@@ -180,7 +186,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                                 
                             }
                             if(isLogin){
-                                handler.sendEmptyMessage(11);
+                                handler.sendEmptyMessage(MsgCode.BOOKING);
                                 reLoginCnt = 0;
                                 httpUtils.order();
                                 isLogin = HttpUtil.orderNormal; //预定不正常，则任务是登录超时了
@@ -193,7 +199,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                             }
                             
                         }
-                        
                         handler.sendEmptyMessage(10);
 
                     } catch (Exception e) {

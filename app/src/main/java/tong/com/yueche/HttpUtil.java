@@ -288,6 +288,7 @@ public class HttpUtil {
         Log.i("tongtest","find car and start Book car!!!");
         String bookResult =  sendJsonPost(bookCarJson, domain + "/Han/ServiceBooking.asmx/BookingCar");
         if(bookResult != null){
+            Log.i("tongtest", "boolResult:" + bookResult);
             //约车成功！
             Log.i("tongtest", "约车成功!!");
             Message msg = handler.obtainMessage();
