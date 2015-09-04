@@ -11,7 +11,7 @@ public class MsgCode {
     public static final int LOGIN_SUCC = 4;
     public static final int BOOK_SUCC = 5;
     public static final int BOOK_CANEL = 6;
-
+    public static final int BOOK_CANEL_CONFIRM = 14;
     public static final int BOOKING_STOP = 10;
     public static final int BOOKING = 11;
     public static final int BOOKING_STOP_NETWORK = 12;

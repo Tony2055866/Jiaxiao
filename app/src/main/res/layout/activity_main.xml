@@ -42,6 +42,7 @@
         android:id="@+id/button" />
     
     <Button android:text="取消预约"
+        android:onClick="cancelClick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

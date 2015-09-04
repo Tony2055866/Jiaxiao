@@ -1,6 +1,8 @@
 package tong.com.yueche;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +13,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.internal.app.ToolbarActionBar;
 import android.transition.Explode;
 import android.util.Log;
 import android.view.Menu;
@@ -24,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.http.protocol.HTTP;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -31,19 +35,19 @@ import java.util.Calendar;
 
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
-
+    static String[] dates = {"上午", "早上", "晚上"};
 
     Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            if(msg.what == 0){
+            if(msg.what == MsgCode.CONN_SERVER_ERR){
 //                LoginActivity.this.To
                 Toast.makeText(getApplicationContext(), "连接服务器错误", Toast.LENGTH_LONG).show();
                 failText.setVisibility(View.VISIBLE);
             }else{
                 failText.setVisibility(View.INVISIBLE);
                 
-                if(msg.what == 1){
+                if(msg.what == MsgCode.CONN_SERVER_SUCC){
                     Toast.makeText(getApplicationContext(), "初始化成功，请输入验证码", Toast.LENGTH_LONG).show();
                     File imgFile = new  File(HttpUtil.path);
                     if(imgFile.exists()){
@@ -51,39 +55,60 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                         image.setImageBitmap(myBitmap);
                         image.setVisibility(View.VISIBLE);
                     }
-                }else if(msg.what == 2){
+                }else if(msg.what == MsgCode.LOGIN_ERR){
                     failText.setVisibility(View.VISIBLE);
                     failText.setText("登录时出错");
-                }else if(msg.what == 3){
+                }else if(msg.what == MsgCode.PWD_ERR){
                     failText.setVisibility(View.VISIBLE);
                     failText.setText("用户名或密码错误");
-                }else if(msg.what == 4){
+                }else if(msg.what == MsgCode.LOGIN_SUCC){
                     failText.setVisibility(View.VISIBLE);
                     failText.setText("登录成功！");
-                }else if(msg.what == 5){
+                }else if(msg.what == MsgCode.BOOK_SUCC){
                     failText.setVisibility(View.VISIBLE);
                     failText.setText("约车成功");
                     CheckBox box = boxes[msg.arg1/3];
-                    String addText = "已约"+(msg.arg1%3);
+                    String addText = "已约 "+ dates[(msg.arg1%3)];
                     if(!box.getText().toString().contains(addText)){
                         box.setText(box.getText().toString() + " " + addText + " ");
                         box.setTextColor(Color.rgb(0, 200, 0));
                     }
-                }else if(msg.what == 6){
+                }else if(msg.what == MsgCode.BOOK_CANEL){
                     //取消约车
+                    Toast.makeText(MainActivity.this, "取消约车成功！", Toast.LENGTH_LONG).show();
                     
-                }else if(msg.what == 10){
+                }else if(msg.what == MsgCode.BOOKING_STOP){
                     failText.setVisibility(View.VISIBLE);
                     failText.setText("已停止");
-                }else if(msg.what == 11){
+                }else if(msg.what == MsgCode.BOOKING){
                     failText.setVisibility(View.VISIBLE);
                     failText.setText("正在刷新中");
-                }else if(msg.what == 12){
+                }else if(msg.what == MsgCode.BOOKING_STOP_NETWORK){
                     failText.setVisibility(View.VISIBLE);
                     failText.setText("网络不可用，已停止");
                 }else if(msg.what == MsgCode.BOOKING_ERROR_NETWORK){
                     failText.setVisibility(View.VISIBLE);
                     failText.setText("网络不可用");
+                }else if(msg.what == MsgCode.BOOK_CANEL_CONFIRM){
+                    new AlertDialog.Builder(MainActivity.this).setTitle("确认退出吗？")
+                            .setIcon(android.R.drawable.ic_dialog_info)
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Log.d("tong test","confirm cancel book");
+                                    new Thread(){
+                                        @Override
+                                        public void run() {
+                                            httpUtils.cancelOrder();
+                                        }
+                                    }.start();
+                                }
+                            })
+                            .setNegativeButton("返回", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            }).show();
                 }
             }
         }
@@ -164,7 +189,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 public void run() {
                     try {
                         while(running){
-                            
+
+                            isLogin = httpUtils.checkisLogin();
+                            Log.i("tongtest","is Login:" + isLogin);
                             if(!isNetworkAvailable(MainActivity.this)){
                                 handler.sendEmptyMessage(MsgCode.BOOKING_ERROR_NETWORK);
                                 return;
@@ -173,7 +200,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                             if(!isLogin){
                                 isLogin =  httpUtils.login( codeText.getText().toString() );
                                 reLoginCnt++;
-                                Thread.sleep(10 * 1000); //停止10秒 再登录
+                                Thread.sleep(3 * 1000); //停止10秒 再登录
                                 if(!isLogin && reLoginCnt >= 5 && isNetworkAvailable(MainActivity.this)) {
                                     failText.setText("登录多次失败, 程序已停止");
                                     break;
@@ -186,6 +213,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                                 
                             }
                             if(isLogin){
+                                
                                 handler.sendEmptyMessage(MsgCode.BOOKING);
                                 reLoginCnt = 0;
                                 httpUtils.order();
@@ -199,7 +227,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                             }
                             
                         }
-                        handler.sendEmptyMessage(10);
+                        //while循环停止，就是停止刷新
+                        handler.sendEmptyMessage(MsgCode.BOOKING_STOP);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -209,6 +238,22 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
     }
 
+    public void cancelClick(View v){
+        new Thread(){
+            @Override
+            public void run() {
+                String html  = httpUtils.getPage("http://haijia.bjxueche.net/NetBooking.aspx");
+                if(html != null && html.contains("取消网上预约")){
+                    Log.d("tongtest","has booked. cancel book");
+                    handler.sendEmptyMessage(MsgCode.BOOK_CANEL_CONFIRM);
+                    
+                }else{
+                   Log.d("tongtest","no need cancel");
+                    Toast.makeText(MainActivity.this, "你还没有约车", Toast.LENGTH_LONG).show();
+                }
+            }
+        }.start();
+    }
 
     public void stopClick(View v){
         if(running){

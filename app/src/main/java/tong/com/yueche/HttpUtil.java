@@ -27,6 +27,7 @@ package tong.com.yueche;
         import org.apache.http.client.entity.UrlEncodedFormEntity;
         import org.apache.http.client.methods.HttpGet;
         import org.apache.http.client.methods.HttpPost;
+        import org.apache.http.client.params.ClientPNames;
         import org.apache.http.client.protocol.ClientContext;
         import org.apache.http.entity.StringEntity;
         import org.apache.http.impl.client.BasicCookieStore;
@@ -48,7 +49,7 @@ public class HttpUtil {
     private String username;
     private String password;
     
-    public static String domain = "http://haijia.bjxueche.net";
+    public static String domain = "http://haijia.bjxueche.net/";
 
     private String __VIEWSTATE, __VIEWSTATEGENERATOR, __EVENTVALIDATION, txtIMGCode;
 
@@ -69,6 +70,7 @@ public class HttpUtil {
         HttpResponse response = null;
         try {
             response = client.execute(httpget, httpContext);
+            Log.d("tongtest","getPage code:" +response.getStatusLine().getStatusCode() );
             if (response.getStatusLine().getStatusCode() == 200) {
                 String result = EntityUtils.toString(response.getEntity());
                 return  result;
@@ -89,18 +91,19 @@ public class HttpUtil {
         cookieStore = new BasicCookieStore();
         client = new DefaultHttpClient();
         httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
-
+        
         HttpGet httpGet = new HttpGet();
 
         httpGet.setHeader("Host", domain);
         httpGet.setHeader("Referer", domain);
         httpGet.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.110 Safari/537.36 CoolNovo/2.0.9.19");
         httpGet.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+        client.getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, false);
         
         String html = getPage(domain);
         if(html == null){
             Log.w("tongtest","init fail html is null!");
-            handler.sendEmptyMessage(0);
+            handler.sendEmptyMessage(MsgCode.CONN_SERVER_ERR);
             return false;
         }else{
             Log.i("tongtest", "init ,get html success");
@@ -145,7 +148,7 @@ public class HttpUtil {
             HttpResponse response = client.execute(get, httpContext);
             boolean downed = download(response.getEntity().getContent(), path);
             if(downed){
-                handler.sendEmptyMessage(1);
+                handler.sendEmptyMessage(MsgCode.CONN_SERVER_SUCC);
             }else{
                 Log.w("tongtest","download faidled");
             }
@@ -176,15 +179,16 @@ public class HttpUtil {
             //Log.i("tongtest","login html result:" + result);
             if(result == null || result == ""){
                 Log.i("tongtest","login html result:" + result);
-                handler.sendEmptyMessage(2);
+                handler.sendEmptyMessage(MsgCode.LOGIN_ERR);
             }else if(result.contains("账号或密码错误")){
                 Log.i("tongtest","login html result: 账号或密码错误");
-                handler.sendEmptyMessage(3);
+                handler.sendEmptyMessage(MsgCode.PWD_ERR);
             }else if(result.equals("true") || result.contains("ych2.aspx")){
-                handler.sendEmptyMessage(4);
+                Log.i("tong test","long reslt html:\n" + result);
+                handler.sendEmptyMessage(MsgCode.LOGIN_SUCC);
                return true;
             }else{
-                handler.sendEmptyMessage(2);
+                handler.sendEmptyMessage(MsgCode.LOGIN_ERR);
                 Log.i("tongtest","login html result: " + result);
             }
         }catch (Exception e){
@@ -216,15 +220,21 @@ public class HttpUtil {
         }
         
         String hidden =  StringUtils.substringBetween(res,"id=\"hiddenKM\" value=\"","\"");
-        if(hidden.length() == 1) hiddenKM = hidden;
+        if(hidden != null && hidden.length() == 1) hiddenKM = hidden;
+        if(hidden == null){
+            Log.i("tongtest","getPage ych2 result:" + res);
+        }
         String allRess[] = StringUtils.substringsBetween(res,"class=\"CellCar\"","</td>");
+        boolean isYue = false;
         for(int i=0; i<24; i++){
             int w = getWeekDay(i/3);
             if(allRess[i].contains("已约")){
                 Message msg = handler.obtainMessage();
-                msg.what = 5;
+                msg.what = MsgCode.BOOK_SUCC;
                 msg.arg1 = i;
                 handler.sendMessage(msg);
+                isYue = true;
+                break;
             }
             else if(!allRess[i].contains("无")){
                 Log.i("tongtest", "week day : " + w + "- "+ i%3 +" 有车");
@@ -247,7 +257,7 @@ public class HttpUtil {
             Log.i("tongtest","start order car:" + i);
             return true;
         }*/
-        String getCarJson = "{\"yyrq\":\"ORDERDATE\",\"yysd\":\""+ yysds[i%3] +"\",\"xllxID\":\"1\",\"pageSize\":35,\"pageNum\":1}";
+        String getCarJson = "{\"yyrq\":\"ORDERDATE\",\"yysd\":\""+ yysds[i%3] +"\",\"xllxID\":\"" +hiddenKM+ "\",\"pageSize\":35,\"pageNum\":1}";
         Calendar c = Calendar.getInstance();
         c.add(Calendar.DATE, i/3);
         SimpleDateFormat format1 = new SimpleDateFormat("yyyyMMdd");
@@ -284,10 +294,10 @@ public class HttpUtil {
         }
 
 
-        String bookCarJson = "{\"yyrq\":\""+orderDateStr+"\",\"xnsd\":\""+xnsd+"\",\"cnbh\":\""+cnbh+"\",\"imgCode\":\"\",\"KMID\":\"1\"}";
-        Log.i("tongtest","find car and start Book car!!!");
+        String bookCarJson = "{\"yyrq\":\""+orderDateStr+"\",\"xnsd\":\""+xnsd+"\",\"cnbh\":\""+cnbh+"\",\"imgCode\":\"\",\"KMID\":\"" +hiddenKM+"\"}";
+        Log.i("tongtest","find car and start Book car!!! bookJson:" + bookCarJson);
         String bookResult =  sendJsonPost(bookCarJson, domain + "/Han/ServiceBooking.asmx/BookingCar");
-        if(bookResult != null){
+        if(bookResult != null && bookResult.contains("Result\\\": true")){
             Log.i("tongtest", "boolResult:" + bookResult);
             //约车成功！
             Log.i("tongtest", "约车成功!!");
@@ -309,7 +319,19 @@ public class HttpUtil {
         return false;
     }
     
-    
+    public boolean cancelOrder(){
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("txtPassword", password);
+        params.put("__VIEWSTATE", STATEVALUES[0]);
+        
+        String result = sendHttpClientPost2("http://haijia.bjxueche.net/NetBooking.aspx", params, "UTF-8");
+        if(result != null && result.contains("成功取消")){
+           handler.sendEmptyMessage(MsgCode.BOOK_CANEL); 
+        }else{
+            Log.d("tongtest","cancelOrder result:" + result);
+        }
+        return true;
+    }
     
     
 
@@ -398,15 +420,21 @@ public class HttpUtil {
             UrlEncodedFormEntity entity=new UrlEncodedFormEntity(list, encode);
             HttpPost httpPost=new HttpPost(path);
             httpPost.setEntity(entity);
+            
             HttpResponse httpResponse= client.execute(httpPost, httpContext);
             Log.i("tongtest", "Login getStatusCode : " + httpResponse.getStatusLine().getStatusCode());
             if(httpResponse.getStatusLine().getStatusCode()==200)
             {
                 InputStream inputStream=httpResponse.getEntity().getContent();
-                return changeInputStream(inputStream,encode);
+                String res = changeInputStream(inputStream,encode);
+                httpResponse.getEntity().consumeContent();
+                return res;
             }else if(httpResponse.getStatusLine().getStatusCode()==302){
                 Log.i("tongtest", "Login success! : " + httpResponse.getHeaders("Location"));
+                httpResponse.getEntity().consumeContent();
                 return "true";
+            }else{
+                Log.i("tongtest","login code:" + httpResponse.getStatusLine().getStatusCode());
             }
 
         } catch (UnsupportedEncodingException e) {
@@ -416,7 +444,42 @@ public class HttpUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        return null;
+    }
 
+    private String sendHttpClientPost2(String path,Map<String, String> map,String encode)
+    {
+        List<NameValuePair> list=new ArrayList<NameValuePair>();
+        if(map!=null&&!map.isEmpty())
+        {
+            for(Map.Entry<String, String> entry:map.entrySet())
+            {
+                list.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+            }
+        }
+        try {
+            UrlEncodedFormEntity entity=new UrlEncodedFormEntity(list, encode);
+            HttpPost httpPost=new HttpPost(path);
+            httpPost.setEntity(entity);
+            HttpResponse httpResponse= client.execute(httpPost, httpContext);
+            Log.i("tongtest", "sendHttpClientPost2 getStatusCode : " + httpResponse.getStatusLine().getStatusCode());
+            //if(httpResponse.getStatusLine().getStatusCode()==200)
+            {
+                InputStream inputStream=httpResponse.getEntity().getContent();
+                String res = changeInputStream(inputStream,encode);
+                httpResponse.getEntity().consumeContent();
+                return res;
+            }
+           
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -438,5 +501,13 @@ public class HttpUtil {
             }
         }
         return result;
+    }
+
+    public boolean checkisLogin() {
+       String res =  getPage("http://haijia.bjxueche.net/index.aspx");
+        Log.i("tongtest","checkisLogin res:" + res);
+        if(res == null || res == "") return false;
+        if(res.contains("ych2.aspx")) return true;
+        return false;
     }
 }
