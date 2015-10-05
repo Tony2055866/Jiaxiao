@@ -73,12 +73,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="周日"
-            android:checked="true"
             android:onClick="weekClick"
             android:id="@+id/checkBox0" />
 
-        
-       
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -141,11 +141,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             int w = HttpUtil.getWeekDay(i);
             calendar.add(Calendar.DATE, i);
             boxes[i].setText("星期" + weekDays[w] + "  " + format1.format(calendar.getTime()));
-            if(w == 0 || w == 6){
+            /*if(w == 0 || w == 6){
                 boxes[i].setChecked(true);
             }else {
                 boxes[i].setChecked(false);
-            }
+            }*/
         }
         new Thread(){
             @Override

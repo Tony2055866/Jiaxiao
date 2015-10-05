@@ -244,7 +244,7 @@ public class HttpUtil {
                    orderCar(i);
                 }
             }else {
-                Log.i("tongtest", "week day : " + w + "- "+ i%3 +" 无车");
+                //Log.i("tongtest", "week day : " + w + "- "+ i%3 +" 无车");
             }
         }
         return false;
@@ -505,7 +505,6 @@ public class HttpUtil {
 
     public boolean checkisLogin() {
        String res =  getPage("http://haijia.bjxueche.net/index.aspx");
-        Log.i("tongtest","checkisLogin res:" + res);
         if(res == null || res == "") return false;
         if(res.contains("ych2.aspx")) return true;
         return false;
